@@ -83,8 +83,11 @@ class My_Lifegame(object):
         p.stdin.write('e\ne\n')
 
 
+
+
+
 def demo():
-    lg = My_Lifegame(size = (32, 32))
+    lg = My_Lifegame(size = (64, 64))
     lg.show_img(lg.p, lg.map)
     while(True):
         lg.run()
