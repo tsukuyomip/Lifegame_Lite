@@ -2,6 +2,7 @@
 
 import numpy as np
 import pylab as pl
+import subprocess
 
 class My_Lifegame(object):
     def __init__(self, size = (10, 10), map = None, rng = None):
@@ -19,14 +20,19 @@ class My_Lifegame(object):
         self.size = size
         self.map = map
         self.rng = rng
+        self.p = subprocess.Popen(['gnuplot','-p'], 
+                                  shell=True,
+                                  stdin=subprocess.PIPE,
+                              )
+
 
     def run(self):
-        print self.map
         next_l = []
         for y in xrange(self.size[1]):
             l = []
             for x in xrange(self.size[0]):
-                l.append(self.next_life(x, y))
+                #l.append(self.next_life(x, y))
+                l.append(self.next_life(y, x))
             next_l.append(l)
 
         self.map = next_l
@@ -42,26 +48,6 @@ class My_Lifegame(object):
             return 1
         else:
             return 0
-
-    def next_life_another(self, x, y):
-        print self.map
-        next = []
-        for y in xrange(self.size[1]):
-            l = []
-            for x in xrange(self.size[0]):
-                n = self.calc_neighber(x, y)
-                if n < 2:
-                    l.append(0)
-                elif n == 2:
-                    l.append(self.map[x][y])
-                elif n == 3:
-                    l.append(1)
-                else:
-                    l.append(0)
-            next.append(l)
-
-        self.map = next
-
 
 
     def calc_neighber(self, x, y):
@@ -88,10 +74,21 @@ class My_Lifegame(object):
         return n
 
 
+    def show_img(self, p, img):
+        p.stdin.write("plot '-' matrix with image\n")
+        for l in self.map:
+            for dat in l:
+                p.stdin.write(str(dat) + ' ')
+            p.stdin.write('\n')
+        p.stdin.write('e\ne\n')
+
+
 def demo():
-    lg = My_Lifegame()
+    lg = My_Lifegame(size = (32, 32))
+    lg.show_img(lg.p, lg.map)
     while(True):
         lg.run()
+        lg.show_img(lg.p, lg.map)
 
 if __name__ == "__main__":
     demo()
